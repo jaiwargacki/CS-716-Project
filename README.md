@@ -12,4 +12,6 @@ two modes of comparison (step through and run time) allow the user to
 understand more fully the improvements that each solution provides over
 the brute force solution.
 
+Link to project website: https://cs.rit.edu/~jpw5681/cs716/home.html
+
 Jai Wargacki, jpw5681@rit.edu
