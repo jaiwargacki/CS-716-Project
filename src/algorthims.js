@@ -65,6 +65,60 @@ function bruteForce(points) {
     return finalHull;
 }
 
+function grahamScan(points) {
+    // Computes the convex hull of a list of points using the Graham Scan approach
+    // Returns a list of points on the convex hull
+
+    // Sort points by increasing x-coordinate
+    points.sort(function (a, b) {
+        if (a[0] == b[0]) {
+            return a[1] - b[1];
+        }
+        return a[0] - b[0];
+    });
+
+    // Create hull, pushing p1 and p2 onto hull
+    if (points.length >= 2) {
+        hull = [points[0], points[1]];
+    } else {
+        return [];
+    }
+
+    // Loop through the remaining points to create upper hull
+    for (let i = 2; i < points.length; i++) {
+        hull.push(points[i]);
+        while (hull.length >= 3 && rLeftOfLine(hull[hull.length - 3], hull[hull.length - 2], hull[hull.length - 1])) {
+            // Remove middle point from hull
+            hull.splice(hull.length - 2, 1);
+        }
+    }
+
+    // Prepare to create lower hull (reverse points and record starting length)
+    points.reverse();
+    let startingLength = hull.length;
+
+    // Loop through the remaining points to create lower hull
+    for (let i = 1; i < points.length; i++) {
+        hull.push(points[i]);
+        while (hull.length > startingLength && rLeftOfLine(hull[hull.length - 3], hull[hull.length - 2], hull[hull.length - 1])) {
+            // Remove middle point from hull
+            hull.splice(hull.length - 2, 1);
+        }
+
+        // Confirm that the last point is not the first point
+        if (hull.length > startingLength && hull[hull.length - 1][0] == hull[0][0] && hull[hull.length - 1][1] == hull[0][1]) {
+            // Remove last point from hull
+            hull.splice(hull.length - 1, 1);
+            break;
+        }
+    }
+
+    // Reverse the hull so it is in counter-clockwise order
+    hull.reverse();
+
+    return hull;
+}
+
 function validateAlgorithm(algorithm, points, expectedHull) {
     // Returns true if the algorithm returns the expected hull
     // Returns false otherwise
@@ -115,14 +169,13 @@ function test() {
         let points = testCases[i][0];
         let hull = testCases[i][1];
 
-        algorithms = [bruteForce];
+        algorithms = [["Brute Force", bruteForce], ["Graham Scan", grahamScan]];
 
         for (let j = 0; j < algorithms.length; j++) {
-            let algorithm = algorithms[j];
-            if (validateAlgorithm(algorithm, points, hull)) {
-                console.log("Test " + (i + 1) + " passed");
+            if (validateAlgorithm(algorithms[j][1], points, hull)) {
+                console.log(algorithms[j][0] + " Test " + (i + 1) + " passed");
             } else {
-                console.log("Test " + (i + 1) + " failed");
+                console.log(algorithms[j][0] + " Test " + (i + 1) + " failed");
             }
         }
     }
