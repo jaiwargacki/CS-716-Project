@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <script src=https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.3.0/math.min.js></script>
+</head>
+<body>
+  <!-- Import CSS -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Title -->
+  <div style="position: relative; text-align: center;">
+    <h3 style="margin: 3px;">Pedagogical Aid: Comparison and Analysis of Convex Hull Solutions</h3>
+    <h4 style="margin: 3px;">CS 716 Project</h4>
+    Jai Wargacki, jpw5681@rit.edu
+  </div>
+  <!-- Line -->
+  <hr>
+  <!-- Canvas and code walkthrough side by side-->
+  <div class="row">
+    <div class="column">
+      <div id="canvasButtons">
+        <button class="button" onclick="clearCanvas()">Clear Canvas</button>
+        <button class="button" onclick="randomPoints()">Generate Random Points</button>
+        <button class="button" onclick="runHull()">Run Convex Hull</button>
+      </div>
+      <canvas id="canvas" width="500" height="500" style="border:1px solid #000000;"></canvas>
+    </div>
+    <div class="column">
+      <!-- Tab areas Code and Runtime Analysis -->
+      <div class="tab">
+        <button id="step-tab" class="bar-item" onclick="openTab('step')">Code Walkthrough</button>
+        <button id="run-tab" class="bar-item bar-item-active" onclick="openTab('run')">Runtime Analysis</button>
+      </div>
+      <div id="step" class="area" style="height: 500px;">
+        Code Demo To Be Implemented
+      </div>
+      <div id="run" class="area" style="display: none;">
+        <!-- Table of run times -->
+        <table id="timeTable">
+          <tr>
+            <th>Number of Points</th>
+            <th>Brute Force</th>
+            <th>Graham's Scan</th>
+            <th>Divide and Conquer</th>
+            <th>Jarvis's March</th>
+          </tr>
+          <tr>
+            <td>
+              To Be Implemented
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <span style="float:left;">Last Updated: October 30, 2023</span>
+    <span style="float:right;">jpw5681@rit.edu</span>
+    <br>
+  </footer>
+  <script src="algorthims.js" type="text/javascript"></script>
+</body>
+</html>

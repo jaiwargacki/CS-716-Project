@@ -1,4 +1,5 @@
-const math = require('mathjs');
+// Not needed when running in browser
+//const math = require('mathjs');
 
 // Helper functions
 function orient(p1, p2, p3) {
@@ -448,3 +449,77 @@ function test() {
 
 // Run tests
 test();
+
+// Start up app
+points = [];
+openTab("run");
+
+// HTML functions
+function openTab(mode) {
+    document.getElementById("step").style.display = "none";
+    document.getElementById("run").style.display = "none";
+    document.getElementById("step-tab").classList.remove("bar-item-active");
+    document.getElementById("run-tab").classList.remove("bar-item-active");
+
+    document.getElementById(mode).style.display = "block";
+    document.getElementById(mode + "-tab").classList.add("bar-item-active");
+}
+
+function runHull() {
+    // Run hull on points, color hull points blue and connect them with lines
+    hull = divideAndConquer(points);
+    const ctx = document.querySelector('canvas').getContext('2d');
+
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw lines
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(hull[0][0], hull[0][1]);
+    ctx.fillStyle = "black";
+    ctx.fillRect(hull[0][0], hull[0][1], 5, 5);
+    for (let i = 1; i < hull.length; i++) {
+        ctx.lineTo(hull[i][0], hull[i][1]);
+        ctx.fillRect(hull[i][0], hull[i][1], 5, 5);
+    }
+    ctx.lineTo(hull[0][0], hull[0][1]);
+    ctx.stroke();
+
+    // Draw points
+    ctx.fillStyle = "#2f60ff";
+    for (let i = 0; i < points.length; i++) {
+        ctx.fillRect(points[i][0], points[i][1], 5, 5);
+    }
+    // Draw hull points
+    ctx.fillStyle = "#ff0000";
+    for (let i = 0; i < hull.length; i++) {
+        ctx.fillRect(hull[i][0], hull[i][1], 5, 5);
+    }
+    
+}
+
+function clearCanvas() {
+    // Clears the canvas
+    const ctx = document.querySelector('canvas').getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    points = [];
+}
+
+function getCursorPosition(canvas, event) {
+    const rect = canvas.getBoundingClientRect()
+    const x = event.clientX - rect.left
+    const y = event.clientY - rect.top
+    // Draw red dot at cursor
+    const ctx = canvas.getContext('2d')
+    ctx.fillStyle = '#2f60ff'
+    ctx.fillRect(x, y, 5, 5)
+    // Add point to list
+    points.push([x, y])
+}
+
+const canvas = document.querySelector('canvas')
+canvas.addEventListener('mousedown', function(e) {
+    getCursorPosition(canvas, e)
+})
