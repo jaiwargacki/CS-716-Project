@@ -2,9 +2,6 @@ const math = require('mathjs');
 
 // Helper functions
 function orient(p1, p2, p3) {
-    // Returns 0 if p1, p2, and p3 are colinear
-    // Returns 1 if p1, p2, and p3 are clockwise
-    // Returns 2 if p1, p2, and p3 are counterclockwise
     matrix = [[1, p1[0], p1[1]], [1, p2[0], p2[1]], [1, p3[0], p3[1]]];
     // Calculate determinant
     return math.det(matrix);
@@ -333,6 +330,59 @@ function divideAndConquer(points) {
     return finalHull;
 }
 
+function jarvisMarch(points) {
+    // Computes the convex hull of a list of points using the Jarvis March approach
+    // Returns a list of points on the convex hull
+
+    // Order points by increasing y-coordinate
+    points.sort(function (a, b) {
+        if (a[1] == b[1]) {
+            return a[0] - b[0];
+        }
+        return a[1] - b[1];
+    });
+
+    // Find lowest point (topmost if tie)
+    const lowest = points[0];
+
+    // Start hull with leftmost point
+    hull = [lowest];
+
+    // Loop until we reach the lowest point again
+    while (true) {
+        p = hull[hull.length - 1];
+        next = points[0];
+        nextDistance = Math.sqrt(Math.pow(p[0] - next[0], 2) + Math.pow(p[1] - next[1], 2));
+        for (let i = 1; i < points.length; i++) {
+            if (points[i][0] == p[0] && points[i][1] == p[1]) {
+                continue;
+            }
+            if (next[0] == p[0] && next[1] == p[1]) {
+                next = points[i];
+                nextDistance = Math.sqrt(Math.pow(p[0] - next[0], 2) + Math.pow(p[1] - next[1], 2));
+                continue;
+            }
+            // If points are colinear, choose the one furthest from p
+            let distance = Math.sqrt(Math.pow(p[0] - points[i][0], 2) + Math.pow(p[1] - points[i][1], 2));
+            if (orient(p, next, points[i]) == 0 && distance > nextDistance) {
+                next = points[i];
+                nextDistance = distance;
+            } else if (orient(p, next, points[i]) > 0) {
+                next = points[i];
+                nextDistance = distance;
+            }
+        }
+
+        if (next[0] == lowest[0] && next[1] == lowest[1]) {
+            break;
+        }
+
+        hull.push(next);
+    }
+
+    return hull;
+}
+
 // Testing
 function validateAlgorithm(algorithm, points, expectedHull) {
     // Returns true if the algorithm returns the expected hull
@@ -384,7 +434,7 @@ function test() {
         let points = testCases[i][0];
         let hull = testCases[i][1];
 
-        algorithms = [["Brute Force", bruteForce], ["Graham Scan", grahamScan], ["Divide and Conquer", divideAndConquer]];
+        algorithms = [["Brute Force", bruteForce], ["Graham Scan", grahamScan], ["Divide and Conquer", divideAndConquer], ["Jarvis March", jarvisMarch]];
 
         for (let j = 0; j < algorithms.length; j++) {
             if (validateAlgorithm(algorithms[j][1], points, hull)) {
