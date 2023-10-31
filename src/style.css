@@ -1,0 +1,64 @@
+.column {
+    float: left;
+    width: 50%;
+}
+.area {
+    float: left;
+    width: 100%;
+    border:1px solid #000000;
+}
+  
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/* Pretty Table */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    color: black;
+    font-size: 18px;
+    text-align: left;
+}
+th {
+    background-color: #2f60ff;
+    color: white;
+}
+
+/* Button Formatting */
+.button {
+    border: none;
+    padding: 6px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 2px;
+}
+
+.button:hover {
+    background-color: #2f60ff;
+    color: white;
+}
+
+.bar-item {
+    padding: 8px 16px;
+    float: left;
+    width: 25%;
+    border: none;
+    outline: none;
+    display: block;
+}
+
+.bar-item:hover {
+    background-color: #2f60ff;
+    color: white;
+}
+
+.bar-item-active {
+    background-color: #2f60ff;
+    color: white;
+}
