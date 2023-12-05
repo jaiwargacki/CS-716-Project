@@ -137,11 +137,28 @@ function findTangents(leftHull, rightHull) {
     return [upperTangent, lowerTangent];
 }
 
+function removeDuplicatePoints(points) {
+    finalHull = [];
+    for (let p = 0; p < points.length; p++) {
+        let duplicate = false;
+        for (let q = 0; q < finalHull.length; q++) {
+            if (points[p][0] == finalHull[q][0] 
+                    && points[p][1] == finalHull[q][1]) {
+                duplicate = true;
+                break;
+            }
+        }
+        if (!duplicate) {
+            finalHull.push(points[p]);
+        }
+    }
+    
+    return finalHull;
+}
+
+
 // Algorithms
 function bruteForce(points) {
-    // Computes the convex hull of a list of points using a brute force approach
-    // Returns a list of points on the convex hull
-
     hull = [];
 
     for (let p = 0; p < points.length; p++) {
@@ -166,7 +183,6 @@ function bruteForce(points) {
         }
     }
     if (hull.length == 0 && points.length > 0) {
-        // return leftmost and rightmost points
         points.sort(function (a, b) {
             if (a[0] == b[0]) {
                 return a[1] - b[1];
@@ -177,29 +193,12 @@ function bruteForce(points) {
         hull.push(points[points.length - 1]);
     }
 
-    // Remove duplicates
-    finalHull = [];
-    for (let p = 0; p < hull.length; p++) {
-        let duplicate = false;
-        for (let q = 0; q < finalHull.length; q++) {
-            if (hull[p][0] == finalHull[q][0] && hull[p][1] == finalHull[q][1]) {
-                duplicate = true;
-                break;
-            }
-        }
-        if (!duplicate) {
-            finalHull.push(hull[p]);
-        }
-    }
-    
+    finalHull = removeDuplicatePoints(hull);
+    finalHull = orderPoints(finalHull);
     return finalHull;
 }
 
 function grahamScan(points) {
-    // Computes the convex hull of a list of points using the Graham Scan approach
-    // Returns a list of points on the convex hull
-
-    // Sort points by increasing x-coordinate
     points.sort(function (a, b) {
         if (a[0] == b[0]) {
             return a[1] - b[1];
@@ -207,58 +206,48 @@ function grahamScan(points) {
         return a[0] - b[0];
     });
 
-    // Create hull, pushing p1 and p2 onto hull
     if (points.length >= 2) {
         hull = [points[0], points[1]];
     } else {
         return [];
     }
 
-    // Loop through the remaining points to create upper hull
     for (let i = 2; i < points.length; i++) {
         hull.push(points[i]);
-        while (hull.length >= 3 && rLeftOfLine(hull[hull.length - 3], hull[hull.length - 2], hull[hull.length - 1])) {
-            // Remove middle point from hull
+        while (hull.length >= 3 && rLeftOfLine(hull[hull.length - 3], 
+                hull[hull.length - 2], hull[hull.length - 1])) {
             hull.splice(hull.length - 2, 1);
         }
     }
 
-    // Prepare to create lower hull (reverse points and record starting length)
     points.reverse();
     let startingLength = hull.length;
 
-    // Loop through the remaining points to create lower hull
     for (let i = 1; i < points.length; i++) {
         hull.push(points[i]);
-        while (hull.length > startingLength && rLeftOfLine(hull[hull.length - 3], hull[hull.length - 2], hull[hull.length - 1])) {
-            // Remove middle point from hull
+        while (hull.length > startingLength 
+                && rLeftOfLine(hull[hull.length - 3], 
+                hull[hull.length - 2], hull[hull.length - 1])) {
             hull.splice(hull.length - 2, 1);
         }
 
-        // Confirm that the last point is not the first point
-        if (hull.length > startingLength && hull[hull.length - 1][0] == hull[0][0] && hull[hull.length - 1][1] == hull[0][1]) {
-            // Remove last point from hull
+        if (hull.length > startingLength 
+                && hull[hull.length - 1][0] == hull[0][0] 
+                && hull[hull.length - 1][1] == hull[0][1]) {
             hull.splice(hull.length - 1, 1);
             break;
         }
     }
 
-    // Reverse the hull so it is in counter-clockwise order
     hull.reverse();
-
     return hull;
 }
 
 function divideAndConquer(points) {
-    // Computes the convex hull of a list of points using the divide and conquer approach
-    // Returns a list of points on the convex hull
-
-    // If |points| <= 3 return bruteForce of points
     if (points.length <= 3) {
         return bruteForce(points);
     }
 
-    // Sort points by increasing x-coordinate
     points.sort(function (a, b) {
         if (a[0] == b[0]) {
             return a[1] - b[1];
@@ -266,8 +255,6 @@ function divideAndConquer(points) {
         return a[0] - b[0];
     });
 
-    
-    // Otherwise, split points into left and right halves by vertical line
     const x_split = points.reduce(function (sum, point) {
         return sum + point[0];
     }, 0) / points.length;
@@ -278,50 +265,37 @@ function divideAndConquer(points) {
         return point[0] > x_split;
     });
 
-    // If one half is empty, return the other half bruteForced
     if (leftPoints.length == 0) {
         return bruteForce(rightPoints);
     } else if (rightPoints.length == 0) {
         return bruteForce(leftPoints);
     }
-    
-    // Recursively compute left and right hulls
+
     let leftHull = divideAndConquer(leftPoints);
     let rightHull = divideAndConquer(rightPoints);
 
-    // Find tangents
     let tangents = findTangents(leftHull, rightHull);
 
-    // Merge left and right hulls
     let hull = [];
     leftHull = orderPoints(leftHull);
-    for (let i = leftHull.indexOf(tangents[0][0]); i != leftHull.indexOf(tangents[1][0]); i = (i + 1) % leftHull.length) {
+    for (let i = leftHull.indexOf(tangents[0][0]); 
+            i != leftHull.indexOf(tangents[1][0]); 
+            i = (i + 1) % leftHull.length) {
         hull.push(leftHull[i]);
     }
     hull.push(tangents[1][0]);
     rightHull = orderPoints(rightHull).reverse();
-    for (let i = rightHull.indexOf(tangents[0][1]); i != rightHull.indexOf(tangents[1][1]); i = (i + 1) % rightHull.length) {
+    for (let i = rightHull.indexOf(tangents[0][1]); 
+            i != rightHull.indexOf(tangents[1][1]); 
+            i = (i + 1) % rightHull.length) {
         hull.push(rightHull[i]);
     }
     hull.push(tangents[1][1]);
-    // Remove duplicates
-    finalHull = [];
-    for (let p = 0; p < hull.length; p++) {
-        let duplicate = false;
-        for (let q = 0; q < finalHull.length; q++) {
-            if (hull[p][0] == finalHull[q][0] && hull[p][1] == finalHull[q][1]) {
-                duplicate = true;
-                break;
-            }
-        }
-        if (!duplicate) {
-            finalHull.push(hull[p]);
-        }
-    }
+    finalHull = removeDuplicatePoints(hull);
     finalHull = orderPoints(finalHull);
-    // Remove colinear points
     for (let i = 0; i < finalHull.length; i++) {
-        if (orient(finalHull[i], finalHull[(i + 1) % finalHull.length], finalHull[(i + 2) % finalHull.length]) == 0) {
+        if (orient(finalHull[i], finalHull[(i + 1) % finalHull.length], 
+                finalHull[(i + 2) % finalHull.length]) == 0) {
             finalHull.splice((i + 1) % finalHull.length, 1);
             i--;
         }
@@ -331,10 +305,6 @@ function divideAndConquer(points) {
 }
 
 function jarvisMarch(points) {
-    // Computes the convex hull of a list of points using the Jarvis March approach
-    // Returns a list of points on the convex hull
-
-    // Order points by increasing y-coordinate
     points.sort(function (a, b) {
         if (a[1] == b[1]) {
             return a[0] - b[0];
@@ -342,28 +312,26 @@ function jarvisMarch(points) {
         return a[1] - b[1];
     });
 
-    // Find lowest point (topmost if tie)
     const lowest = points[0];
-
-    // Start hull with leftmost point
     hull = [lowest];
 
-    // Loop until we reach the lowest point again
     while (true) {
         p = hull[hull.length - 1];
         next = points[0];
-        nextDistance = Math.sqrt(Math.pow(p[0] - next[0], 2) + Math.pow(p[1] - next[1], 2));
+        nextDistance = Math.sqrt(Math.pow(p[0] - next[0], 2) + 
+            Math.pow(p[1] - next[1], 2));
         for (let i = 1; i < points.length; i++) {
             if (points[i][0] == p[0] && points[i][1] == p[1]) {
                 continue;
             }
             if (next[0] == p[0] && next[1] == p[1]) {
                 next = points[i];
-                nextDistance = Math.sqrt(Math.pow(p[0] - next[0], 2) + Math.pow(p[1] - next[1], 2));
+                nextDistance = Math.sqrt(Math.pow(p[0] - next[0], 2) + 
+                    Math.pow(p[1] - next[1], 2));
                 continue;
             }
-            // If points are colinear, choose the one furthest from p
-            let distance = Math.sqrt(Math.pow(p[0] - points[i][0], 2) + Math.pow(p[1] - points[i][1], 2));
+            let distance = Math.sqrt(Math.pow(p[0] - points[i][0], 2) + 
+                Math.pow(p[1] - points[i][1], 2));
             if (orient(p, next, points[i]) == 0 && distance > nextDistance) {
                 next = points[i];
                 nextDistance = distance;
@@ -459,6 +427,8 @@ runGrahamScan = true;
 runDivideAndConquer = true;
 runJarvisMarch = true;
 
+walkthroughAlgorithm = undefined;
+
 // HTML functions
 function openTab(mode) {
     document.getElementById("step").style.display = "none";
@@ -474,11 +444,17 @@ function openTab(mode) {
         runGrahamScan = true;
         runDivideAndConquer = true;
         runJarvisMarch = true;
+        document.getElementById("bruteForce").classList.remove("toggled");
+        document.getElementById("grahamScan").classList.remove("toggled");
+        document.getElementById("divideAndConquer").classList.remove("toggled");
+        document.getElementById("jarvisMarch").classList.remove("toggled");
+        walkthroughAlgorithm = undefined;
     } else {
         runBruteForce = false;
         runGrahamScan = false;
         runDivideAndConquer = false;
         runJarvisMarch = false;
+        changeAlgorithm();
     }
 }
 
@@ -595,16 +571,20 @@ function runAll() {
         return;
     } 
     if (!runBruteForce && !runGrahamScan && !runDivideAndConquer && !runJarvisMarch) {
+        if (walkthroughAlgorithm != undefined) {
+            runComplete();
+            return;
+        }
         alert("No algorithms selected");
         return;
     }
 
     // Run all algorithms
     let times = [];
-    times.push(runBruteForce ? runHull(bruteForce) : 0);
-    times.push(runGrahamScan ? runHull(grahamScan) : 0);
-    times.push(runDivideAndConquer ? runHull(divideAndConquer) : 0);
-    times.push(runJarvisMarch ? runHull(jarvisMarch) : 0);
+    times.push(runBruteForce ? runHull(bruteForce) : -1);
+    times.push(runGrahamScan ? runHull(grahamScan) : -1);
+    times.push(runDivideAndConquer ? runHull(divideAndConquer) : -1);
+    times.push(runJarvisMarch ? runHull(jarvisMarch) : -1);
 
     // Create new row in table(id="timeTable")
     // Rows: numPoints, bruteForce, grahamScan, divideAndConquer, jarvisMarch
@@ -614,10 +594,150 @@ function runAll() {
     cell.innerHTML = points.length;
     for (let i = 0; i < times.length; i++) {
         cell = row.insertCell(i + 1);
-        if (times[i] == 0) {
+        if (times[i] == -1) {
             cell.innerHTML = "-";
         } else {
             cell.innerHTML = (times[i] / 1000).toFixed(3);
         }
+    }
+}
+
+function changeAlgorithm() {
+    // Change algorithm to the selected algorithm
+    let algorithm = document.getElementById("algorithmForWalkThrough").value;
+    
+    // Set id=codeWalkthroughText to the code for the selected algorithm
+    if (algorithm == "bruteForce") {
+        walkthroughAlgorithm = bruteForce;
+    } else if (algorithm == "grahamScan") {
+        walkthroughAlgorithm = grahamScan;
+    } else if (algorithm == "divideAndConquer") {
+        walkthroughAlgorithm = divideAndConquer;
+    } else if (algorithm == "jarvisMarch") {
+        walkthroughAlgorithm = jarvisMarch;
+    }
+    document.getElementById("codeWalkthroughText").innerHTML = walkthroughAlgorithm.toString();
+}
+
+function waitForButtonClick() {
+    return new Promise(resolve => {
+      const button = document.getElementById('nextButton');
+      button.addEventListener('click', () => {
+        resolve('Button clicked');
+      });
+    });
+  }
+
+async function highlightLine(lineNumbers) {
+    await highlightLine(lineNumbers, undefined);
+}
+
+async function highlightLine(lineNumbers, note) {
+    // lineNumbers list of line numbers to highlight
+    // notes list of notes to display for each line
+    let code = walkthroughAlgorithm.toString();
+    let lines = code.split("\n");
+    let highlightedCode = "";
+    for (let i = 0; i < lines.length; i++) {
+        if (lineNumbers.includes(i)) {
+            highlightedCode += "<mark>" + lines[i] + "</mark>\n";
+        } else {
+            highlightedCode += lines[i] + "\n";
+        }
+    }
+    document.getElementById("codeWalkthroughText").innerHTML = highlightedCode;
+
+    // Update codeDescription
+    if (note != undefined) {
+        document.getElementById("codeDescription").innerHTML = note;
+    } else {
+        document.getElementById("codeDescription").innerHTML = "";
+    }
+
+    await waitForButtonClick();
+}
+
+async function bruteForceWalkthrough() {
+    hull = [];
+    await highlightLine([1], "Initialize hull to empty list");
+
+    for (let p = 0; p < points.length; p++) {
+        await highlightLine([3])
+        for (let q = 0; q < points.length; q++) {
+            await highlightLine([4])
+            await highlightLine([5], "Check if p == q");
+            if (p == q) {
+                await highlightLine([6], "Skip this iteration");
+                continue;
+            }
+            let valid = true;
+            await highlightLine([8], "Set valid to true");
+            for (let r = 0; r < points.length; r++) {
+                await highlightLine([9])
+                await highlightLine([10], "Check if r == p or r == q");
+                if (r == p || r == q) {
+                    await highlightLine([11], "Skip this iteration");
+                    continue;
+                }
+                await highlightLine([13], "Check if r is left of line from p to q");
+                if (rLeftOfLine(points[p], points[q], points[r])) {
+                    await highlightLine([14], "Set valid to false");
+                    valid = false;
+                    await highlightLine([15], "Break out of loop");
+                    break;
+                }
+            }
+            await highlightLine([18], "Check if still valid");
+            if (valid) {
+                hull.push(points[p]);
+                hull.push(points[q]);
+                drawHull(hull);
+                await highlightLine([19,20], "Add p and q to hull");
+            }
+        }
+    }
+    await highlightLine([24], "Check if hull is empty despite having points");
+    if (hull.length == 0 && points.length > 0) {
+        await highlightLine([25,26,27,28,29,30], "Sort points");
+        points.sort(function (a, b) {
+            if (a[0] == b[0]) {
+                return a[1] - b[1];
+            }
+            return a[0] - b[0];
+        });
+        hull.push(points[0]);
+        hull.push(points[points.length - 1]);
+        drawHull(hull);
+        await highlightLine([31,32], "Add first and last point to hull");
+    }
+
+    await highlightLine([35], "Remove duplicate points from hull");
+    finalHull = removeDuplicatePoints(hull);
+    finalHull = orderPoints(finalHull);
+    await highlightLine([36], "Order points in counter-clockwise order");
+    drawHull(finalHull);
+    await highlightLine([37], "Return final hull");
+    return finalHull;
+}
+
+function runComplete() {
+    if (walkthroughAlgorithm == undefined) {
+        alert("No algorithm selected");
+        return;
+    }
+    if (points.length < 3) {
+        alert("Not enough points to run algorithm");
+        return;
+    }
+
+    // Run algorithm
+    if (walkthroughAlgorithm == bruteForce) {
+        bruteForceWalkthrough();
+    } else if (walkthroughAlgorithm == grahamScan) {
+        grahamScanWalkthrough();
+    } else if (walkthroughAlgorithm == divideAndConquer) {
+        divideAndConquerWalkthrough();
+    } else if (walkthroughAlgorithm == jarvisMarch) {
+        jarvisMarchWalkthrough();
     }
 }
