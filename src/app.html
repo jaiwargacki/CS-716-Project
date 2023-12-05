@@ -18,11 +18,12 @@
   <div class="row">
     <div class="column">
       <div id="canvasButtons">
-        <button class="button" onclick="clearCanvas()">Clear Canvas</button>
+        <input type="text" id="numPoints" placeholder="Number of Points">
         <button class="button" onclick="randomPoints()">Generate Random Points</button>
-        <button class="button" onclick="runHull()">Run Convex Hull</button>
+        <button class="button" onclick="runAll()">Run Convex Hull</button>
+        <button class="button" onclick="clearCanvas()">Clear</button>
       </div>
-      <canvas id="canvas" width="500" height="500" style="border:1px solid #000000;"></canvas>
+      <canvas id="canvas" width="600" height="500" style="border:1px solid #000000;"></canvas>
     </div>
     <div class="column">
       <!-- Tab areas Code and Runtime Analysis -->
@@ -37,16 +38,11 @@
         <!-- Table of run times -->
         <table id="timeTable">
           <tr>
-            <th>Number of Points</th>
-            <th>Brute Force</th>
-            <th>Graham's Scan</th>
-            <th>Divide and Conquer</th>
-            <th>Jarvis's March</th>
-          </tr>
-          <tr>
-            <td>
-              To Be Implemented
-            </td>
+            <th id="numberOfPointsLabel">Number of Points</th>
+            <th id='bruteForce' onclick="toggle('bruteForce')">Brute Force</th>
+            <th id='grahamScan' onclick="toggle('grahamScan')">Graham's Scan</th>
+            <th id='divideAndConquer' onclick="toggle('divideAndConquer')">Divide and Conquer</th>
+            <th id='jarvisMarch' onclick="toggle('jarvisMarch')">Jarvis's March</th>
           </tr>
         </table>
       </div>

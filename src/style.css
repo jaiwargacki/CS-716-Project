@@ -16,16 +16,54 @@
 }
 
 /* Pretty Table */
+tbody {
+    width: max-content;
+}
+
 table {
     border-collapse: collapse;
-    width: 100%;
     color: black;
     font-size: 18px;
     text-align: left;
+    overflow-y: scroll;
+    display: block;
+    max-height: 500px;
 }
+
 th {
     background-color: #2f60ff;
     color: white;
+    padding: 9.3px;
+}
+
+th:hover:not(#numberOfPointsLabel) {
+    background-color: #2f60ff;
+    color: rgb(171, 171, 171);
+    padding: 9.3px;
+}
+
+th.toggled {
+    background-color: #2f60ff;
+    color: rgb(171, 171, 171);
+    padding: 9.3px;
+}
+
+tr {
+    text-align: center;
+}
+
+/* Every other row is grey */
+tr:nth-child(even) {background-color: #f2f2f2}
+
+/* Input Formatting like buttons */
+.input {
+    border: none;
+    padding: 6px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 2px;
 }
 
 /* Button Formatting */

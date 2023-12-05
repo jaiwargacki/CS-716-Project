@@ -27,7 +27,6 @@ function angleTo(p1, p2) {
     return angle;
 }
     
-
 function orderPoints(points) {
     // Sort points in counter-clockwise order
     averageX = points.reduce(function (sum, point) {
@@ -454,6 +453,12 @@ test();
 points = [];
 openTab("run");
 
+// Do you run these functions? 
+runBruteForce = true;
+runGrahamScan = true;
+runDivideAndConquer = true;
+runJarvisMarch = true;
+
 // HTML functions
 function openTab(mode) {
     document.getElementById("step").style.display = "none";
@@ -463,11 +468,57 @@ function openTab(mode) {
 
     document.getElementById(mode).style.display = "block";
     document.getElementById(mode + "-tab").classList.add("bar-item-active");
+
+    if (mode == "run") {
+        runBruteForce = true;
+        runGrahamScan = true;
+        runDivideAndConquer = true;
+        runJarvisMarch = true;
+    } else {
+        runBruteForce = false;
+        runGrahamScan = false;
+        runDivideAndConquer = false;
+        runJarvisMarch = false;
+    }
 }
 
-function runHull() {
+function toggle(algorithmName) {
+    if (algorithmName == "bruteForce") {
+        runBruteForce = !runBruteForce;
+    } else if (algorithmName == "grahamScan") {
+        runGrahamScan = !runGrahamScan;
+    } else if (algorithmName == "divideAndConquer") {
+        runDivideAndConquer = !runDivideAndConquer;
+    } else if (algorithmName == "jarvisMarch") {
+        runJarvisMarch = !runJarvisMarch;
+    }
+
+    toggled = document.getElementById(algorithmName).classList.contains("toggled");
+    if (!toggled) {
+        document.getElementById(algorithmName).classList.add("toggled");
+    } else {
+        document.getElementById(algorithmName).classList.remove("toggled");
+    }
+}
+    
+
+function runHull(func) {
+    const start_time = performance.now();
     // Run hull on points, color hull points blue and connect them with lines
-    hull = divideAndConquer(points);
+    hull = func(points);
+    drawHull(hull);
+    return performance.now() - start_time;
+}
+
+function drawPoint(ctx, x, y, color) {
+    // Draw red dot at cursor (circle)
+    ctx.fillStyle = color
+    ctx.beginPath();
+    ctx.arc(x, y, 3, 0, 2 * Math.PI);
+    ctx.fill();
+}
+
+function drawHull(hull) {
     const ctx = document.querySelector('canvas').getContext('2d');
 
     // Clear canvas
@@ -479,23 +530,19 @@ function runHull() {
     ctx.beginPath();
     ctx.moveTo(hull[0][0], hull[0][1]);
     ctx.fillStyle = "black";
-    ctx.fillRect(hull[0][0], hull[0][1], 5, 5);
     for (let i = 1; i < hull.length; i++) {
         ctx.lineTo(hull[i][0], hull[i][1]);
-        ctx.fillRect(hull[i][0], hull[i][1], 5, 5);
     }
     ctx.lineTo(hull[0][0], hull[0][1]);
     ctx.stroke();
 
     // Draw points
-    ctx.fillStyle = "#2f60ff";
     for (let i = 0; i < points.length; i++) {
-        ctx.fillRect(points[i][0], points[i][1], 5, 5);
+        drawPoint(ctx, points[i][0], points[i][1], '#2f60ff');
     }
     // Draw hull points
-    ctx.fillStyle = "#ff0000";
     for (let i = 0; i < hull.length; i++) {
-        ctx.fillRect(hull[i][0], hull[i][1], 5, 5);
+        drawPoint(ctx, hull[i][0], hull[i][1], '#ff0000');
     }
     
 }
@@ -507,19 +554,70 @@ function clearCanvas() {
     points = [];
 }
 
-function getCursorPosition(canvas, event) {
+function createPointOnClick(canvas, event) {
     const rect = canvas.getBoundingClientRect()
     const x = event.clientX - rect.left
     const y = event.clientY - rect.top
-    // Draw red dot at cursor
     const ctx = canvas.getContext('2d')
-    ctx.fillStyle = '#2f60ff'
-    ctx.fillRect(x, y, 5, 5)
+    drawPoint(ctx, x, y, '#2f60ff');
     // Add point to list
     points.push([x, y])
 }
 
 const canvas = document.querySelector('canvas')
 canvas.addEventListener('mousedown', function(e) {
-    getCursorPosition(canvas, e)
+    createPointOnClick(canvas, e)
 })
+
+function addRandomPoint(n) {
+    // Adds n random points to the canvas
+    const ctx = document.querySelector('canvas').getContext('2d');
+    for (let i = 0; i < n; i++) {
+        let x = Math.floor(Math.random() * (canvas.width - 20)) + 10;
+        let y = Math.floor(Math.random() * (canvas.height - 20)) + 10;
+        drawPoint(ctx, x, y, '#2f60ff');
+        // Add point to list
+        points.push([x, y])
+    }
+}
+
+function randomPoints() {
+    // Get number of points to generate from id="numPoints"
+    let numPoints = document.getElementById("numPoints").value;
+
+    clearCanvas();
+    addRandomPoint(numPoints);
+}
+
+function runAll() {
+    if (points.length < 3) {
+        alert("Not enough points to run algorithms");
+        return;
+    } 
+    if (!runBruteForce && !runGrahamScan && !runDivideAndConquer && !runJarvisMarch) {
+        alert("No algorithms selected");
+        return;
+    }
+
+    // Run all algorithms
+    let times = [];
+    times.push(runBruteForce ? runHull(bruteForce) : 0);
+    times.push(runGrahamScan ? runHull(grahamScan) : 0);
+    times.push(runDivideAndConquer ? runHull(divideAndConquer) : 0);
+    times.push(runJarvisMarch ? runHull(jarvisMarch) : 0);
+
+    // Create new row in table(id="timeTable")
+    // Rows: numPoints, bruteForce, grahamScan, divideAndConquer, jarvisMarch
+    let table = document.getElementById("timeTable");
+    let row = table.insertRow(1);
+    let cell = row.insertCell(0);
+    cell.innerHTML = points.length;
+    for (let i = 0; i < times.length; i++) {
+        cell = row.insertCell(i + 1);
+        if (times[i] == 0) {
+            cell.innerHTML = "-";
+        } else {
+            cell.innerHTML = (times[i] / 1000).toFixed(3);
+        }
+    }
+}
