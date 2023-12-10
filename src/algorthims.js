@@ -398,6 +398,8 @@ test();
 points = [];
 openTab("run");
 
+inlineNotes = {}
+
 // Do you run these functions? 
 runBruteForce = true;
 runGrahamScan = true;
@@ -612,16 +614,13 @@ async function highlightLine(lineNumbers) {
 }
 
 async function highlightLine(lineNumbers, note) {
-    await highlightLine(lineNumbers, note, undefined);
-}
-
-async function highlightLine(lineNumbers, note, inLineNote) {
     // lineNumbers list of line numbers to highlight
     // notes list of notes to display for each line
     let code = walkthroughAlgorithm.toString();
     let lines = code.split("\n");
     let highlightedCode = "";
     for (let i = 0; i < lines.length; i++) {
+        let inLineNote = inlineNotes[i];
         if (lineNumbers.includes(i)) {
             if (inLineNote != undefined) {
                 highlightedCode += "<mark>" + lines[i] + "</mark>\t<span class=\"note\">" + inLineNote + "</span>\n";
@@ -629,7 +628,11 @@ async function highlightLine(lineNumbers, note, inLineNote) {
                 highlightedCode += "<mark>" + lines[i] + "</mark>\n";
             }
         } else {
-            highlightedCode += lines[i] + "\n";
+            if (inLineNote != undefined) {
+                highlightedCode += lines[i] + "\t<span class=\"note\">" + inLineNote + "</span>\n";
+            } else {
+                highlightedCode += lines[i] + "\n";
+            }
         }
     }
     document.getElementById("codeWalkthroughText").innerHTML = highlightedCode;
@@ -645,65 +648,84 @@ async function highlightLine(lineNumbers, note, inLineNote) {
 }
 
 async function bruteForceWalkthrough() {
+    inlineNotes = {};
     hull = [];
-    await highlightLine([1]);
+    inlineNotes[1] = "hull = []";
+    await highlightLine([1], "Initialize hull to empty list");
+    inlineNotes[1] = undefined;
 
     for (let p = 0; p < points.length; p++) {
-        await highlightLine([3]);
+        inlineNotes = {};
+        inlineNotes[3] = "p=" + p + "; " + points[p]
+        await highlightLine([3], "Loop through all points. Note the nested for loops");
         for (let q = 0; q < points.length; q++) {
-            await highlightLine([4]);
-            await highlightLine([5]);
+            inlineNotes = {};
+            inlineNotes[3] = "p=" + p + "; " + points[p]
+            inlineNotes[4] = "q=" + q + "; " + points[q]
+            await highlightLine([4], "Loop through all points. Note the nested for loops");
+            await highlightLine([5], "Skip the pairing of points if they are the same point");
             if (p == q) {
                 await highlightLine([6]);
                 continue;
             }
             let valid = true;
-            await highlightLine([8]);
+            await highlightLine([8], "Initialize valid to true");
             for (let r = 0; r < points.length; r++) {
-                await highlightLine([9]);
-                await highlightLine([10]);
+                await highlightLine([9], "Loop through all points. Note the nested for loops");
+                await highlightLine([10], "Skip the pairing of points if any of them are the same point");
                 if (r == p || r == q) {
-                    await highlightLine([11]);
+                    await highlightLine([11], "Skip the pairing of points if any of them are the same point");
                     continue;
                 }
-                await highlightLine([13]);
+                inlineNotes[13] = "" + rLeftOfLine(points[p], points[q], points[r]);
+                await highlightLine([13], "Check if point r is to the left of the line from point p to point q");
                 if (rLeftOfLine(points[p], points[q], points[r])) {
                     valid = false;
-                    await highlightLine([14]);
-                    await highlightLine([15]);
+                    await highlightLine([14], "If point r is to the left of the line from point p to point q, then the pairing of points p and q is not valid");
+                    await highlightLine([15], "Break out of the loop");
+                    inlineNotes[13] = undefined;
                     break;
                 }
+                inlineNotes[13] = undefined;
             }
-            await highlightLine([18]);
+            inlineNotes[18] = "valid=" + valid;
+            await highlightLine([18], "Check if the pairing of points p and q is valid");
             if (valid) {
+                inlineNotes[19] = "points[p]=" + points[p];
                 hull.push(points[p]);
                 drawHull(hull);
-                await highlightLine([19]);
+                await highlightLine([19], "Add point p to the hull");
+                inlineNotes[20] = "points[q]=" + points[q];
                 hull.push(points[q]);
                 drawHull(hull);
-                await highlightLine([20]);
+                await highlightLine([20], "Add point q to the hull");
             }
         }
     }
-    await highlightLine([24]);
+    inlineNotes = {};
+    inlineNotes[23] = "hull.length=" + hull.length;
+    await highlightLine([24], "Check if the hull is empty. This is the case if there are no points");
     if (hull.length == 0 && points.length > 0) {
         points.sort(orderInitialPoints);
-        await highlightLine([25]);
+        await highlightLine([25], "If the hull is empty, add the leftmost and rightmost points to the hull");
         hull.push(points[0]);
         drawHull(hull);
-        await highlightLine([26]);
+        await highlightLine([26], "If the hull is empty, add the leftmost and rightmost points to the hull");
         hull.push(points[points.length - 1]);
         drawHull(hull);
-        await highlightLine([27]);
+        await highlightLine([27], "If the hull is empty, add the leftmost and rightmost points to the hull");
     }
+    inlineNotes = {};
 
     finalHull = removeDuplicatePoints(hull);
+    inlineNotes[30] = "finalHull=" + finalHull.length;
     drawHull(finalHull);
-    await highlightLine([30]);
+    await highlightLine([30], "Remove duplicate points from the hull");
     finalHull = orderPoints(finalHull);
-    drawHull(finalHull);
-    await highlightLine([31]);
-    await highlightLine([32]);
+    drawHull(finalHull)
+    await highlightLine([31], "Order the points in the hull");
+    await highlightLine([32], "Return the hull");
+    inlineNotes = {};
     await highlightLine([-1]);
 
 }
