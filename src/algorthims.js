@@ -793,27 +793,32 @@ async function grahamScanWalkthrough() {
 }
 
 async function divideAndConquerWalkthrough(points) {
-    await highlightLine([1]);
+    inlineNotes = {};
+    inlineNotes[1] = "points.length=" + points.length;
+    await highlightLine([1], "Check if there are less than 3 points");
     if (points.length <= 3) {
-        await highlightLine([2]);
+        await highlightLine([2], "If there are less than 3 points, return the hull");
         return bruteForce(points);
     }
 
     points.sort(orderInitialPoints);
-    await highlightLine([5]);
+    await highlightLine([5], "Sort the points by x coordinate");
 
     const x_split = points.reduce(function (sum, point) {
         return sum + point[0];
     }, 0) / points.length;
-    await highlightLine([7,8,9]);
+    inlineNotes[7] = "x_split=" + x_split;
+    await highlightLine([7,8,9], "Find the x coordinate to split the points on");
     let leftPoints = points.filter(function (point) {
         return point[0] <= x_split;
     });
-    await highlightLine([10,11,12]);
+    inlineNotes[10] = "leftPoints.length=" + leftPoints.length;
+    await highlightLine([10,11,12], "Split the points into left and right points");
     let rightPoints = points.filter(function (point) {
         return point[0] > x_split;
     });
-    await highlightLine([13,14,15]);
+    inlineNotes[13] = "rightPoints.length=" + rightPoints.length;
+    await highlightLine([13,14,15], "Split the points into left and right points");
 
     await highlightLine([17]);
     if (leftPoints.length == 0) {
@@ -827,62 +832,76 @@ async function divideAndConquerWalkthrough(points) {
         }
     }
 
-    await highlightLine([23]);
+    await highlightLine([23], "Recursively call divide and conquer on the left and right points");
+    let beforeRecursion = inlineNotes;
     let leftHull = await divideAndConquerWalkthrough(leftPoints);
-    await highlightLine([24]);
+    inlineNotes = beforeRecursion;
+    inlineNotes[23] = "leftHull.length=" + leftHull.length;
+    await highlightLine([24], "Recursively call divide and conquer on the left and right points");
+    beforeRecursion = inlineNotes;
     let rightHull = await divideAndConquerWalkthrough(rightPoints);
+    inlineNotes = beforeRecursion;
+    inlineNotes[24] = "rightHull.length=" + rightHull.length;
     
     let tangents = findTangents(leftHull, rightHull);
-    await highlightLine([26]);
+    inlineNotes[26] = "tangents[0][0]=" + tangents[0][0] + "; tangents[0][1]=" + tangents[0][1];
+    await highlightLine([26], "Find the tangents between the left and right hulls");
 
     let hull = [];
-    await highlightLine([28]);
+    await highlightLine([28], "Initialize the hull to empty list");
     leftHull = orderPoints(leftHull);
-    await highlightLine([29]);
+    await highlightLine([29], "Order the points in the left hull");
     for (let i = leftHull.indexOf(tangents[0][0]); 
             i != leftHull.indexOf(tangents[1][0]); 
             i = (i + 1) % leftHull.length) {
-        await highlightLine([30,31,32]);
+        inlineNotes[30] = "i=" + i + "; " + leftHull[i];
+        await highlightLine([30,31,32], "Loop through the points in the left hull between the tangents");
         hull.push(leftHull[i]);
         drawHull(hull);
-        await highlightLine([33]);
+        await highlightLine([33], "Add the current point to the hull");
     }
+    inlineNotes[30] = undefined;
     hull.push(tangents[1][0]);
     drawHull(hull);
-    await highlightLine([35]);
+    await highlightLine([35], "Add the tangent point to the hull");
     rightHull = orderPoints(rightHull).reverse();
-    await highlightLine([36]);
+    await highlightLine([36], "Order the points in the right hull (in reverse order by x coordinate)");
     for (let i = rightHull.indexOf(tangents[0][1]); 
             i != rightHull.indexOf(tangents[1][1]); 
             i = (i + 1) % rightHull.length) {
-        await highlightLine([37,38,39]);
+        inlineNotes[37] = "i=" + i + "; " + rightHull[i];
+        await highlightLine([37,38,39], "Loop through the points in the right hull between the tangents");
         hull.push(rightHull[i]);
         drawHull(hull);
-        await highlightLine([40]);
+        await highlightLine([40], "Add the current point to the hull");
     }
+    inlineNotes[37] = undefined;
     hull.push(tangents[1][1]);
     drawHull(hull);
-    await highlightLine([42]);
+    await highlightLine([42], "Add the tangent point to the hull");
     finalHull = removeDuplicatePoints(hull);
     drawHull(finalHull);
-    await highlightLine([43]);
+    await highlightLine([43], "Remove duplicate points from the hull");
     finalHull = orderPoints(finalHull);
     drawHull(finalHull);
-    await highlightLine([44]);
+    await highlightLine([44], "Order the points in the hull");
     for (let i = 0; i < finalHull.length; i++) {
-        await highlightLine([45]);
-        await highlightLine([46, 47]);
+        inlineNotes[45] = "i=" + i + "; " + finalHull[i];
+        await highlightLine([45], "Remove colinear points")
+        await highlightLine([46, 47], "Remove colinear points: Check if the points are colinear")
         if (orient(finalHull[i], finalHull[(i + 1) % finalHull.length], 
                 finalHull[(i + 2) % finalHull.length]) == 0) {
             finalHull.splice((i + 1) % finalHull.length, 1);
             drawHull(finalHull);
-            await highlightLine([48]);
+            await highlightLine([48], "Remove colinear points: Remove the middle point if the points are colinear");
             i--;
-            await highlightLine([49]);
+            await highlightLine([49], "Remove colinear points: Decrement i to account for the removed point");
         }
     }
+    inlineNotes[45] = undefined;
 
-    await highlightLine([53]);
+    await highlightLine([53], "Return the hull");
+    inlineNotes = {};
     return finalHull;
 }
 
