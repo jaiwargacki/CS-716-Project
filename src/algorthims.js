@@ -156,6 +156,13 @@ function removeDuplicatePoints(points) {
     return finalHull;
 }
 
+function orderInitialPoints(a, b) {
+    if (a[0] == b[0]) {
+        return a[1] - b[1];
+    }
+    return a[0] - b[0];
+}
+
 
 // Algorithms
 function bruteForce(points) {
@@ -183,12 +190,7 @@ function bruteForce(points) {
         }
     }
     if (hull.length == 0 && points.length > 0) {
-        points.sort(function (a, b) {
-            if (a[0] == b[0]) {
-                return a[1] - b[1];
-            }
-            return a[0] - b[0];
-        });
+        points.sort(orderInitialPoints);
         hull.push(points[0]);
         hull.push(points[points.length - 1]);
     }
@@ -199,12 +201,7 @@ function bruteForce(points) {
 }
 
 function grahamScan(points) {
-    points.sort(function (a, b) {
-        if (a[0] == b[0]) {
-            return a[1] - b[1];
-        }
-        return a[0] - b[0];
-    });
+    points.sort(orderInitialPoints);
 
     if (points.length >= 2) {
         hull = [points[0], points[1]];
@@ -213,33 +210,20 @@ function grahamScan(points) {
     }
 
     for (let i = 2; i < points.length; i++) {
-        hull.push(points[i]);
-        while (hull.length >= 3 && rLeftOfLine(hull[hull.length - 3], 
-                hull[hull.length - 2], hull[hull.length - 1])) {
-            hull.splice(hull.length - 2, 1);
+        while (hull.length >= 2 && orient(points[i], hull[hull.length - 1], hull[hull.length - 2]) <= 0) {
+            hull.pop();
         }
+        hull.push(points[i]);
     }
-
     points.reverse();
-    let startingLength = hull.length;
-
-    for (let i = 1; i < points.length; i++) {
-        hull.push(points[i]);
-        while (hull.length > startingLength 
-                && rLeftOfLine(hull[hull.length - 3], 
-                hull[hull.length - 2], hull[hull.length - 1])) {
-            hull.splice(hull.length - 2, 1);
+    let bottomHull = [points[0], points[1]];
+    for (let i = 2; i < points.length; i++) {
+        while (bottomHull.length >= 2 && orient(points[i], bottomHull[bottomHull.length - 1], bottomHull[bottomHull.length - 2]) <= 0) {
+            bottomHull.pop();
         }
-
-        if (hull.length > startingLength 
-                && hull[hull.length - 1][0] == hull[0][0] 
-                && hull[hull.length - 1][1] == hull[0][1]) {
-            hull.splice(hull.length - 1, 1);
-            break;
-        }
+        bottomHull.push(points[i]);
     }
-
-    hull.reverse();
+    hull = hull.concat(bottomHull.slice(1, bottomHull.length - 1));
     return hull;
 }
 
@@ -248,12 +232,7 @@ function divideAndConquer(points) {
         return bruteForce(points);
     }
 
-    points.sort(function (a, b) {
-        if (a[0] == b[0]) {
-            return a[1] - b[1];
-        }
-        return a[0] - b[0];
-    });
+    points.sort(orderInitialPoints);
 
     const x_split = points.reduce(function (sum, point) {
         return sum + point[0];
@@ -305,12 +284,7 @@ function divideAndConquer(points) {
 }
 
 function jarvisMarch(points) {
-    points.sort(function (a, b) {
-        if (a[1] == b[1]) {
-            return a[0] - b[0];
-        }
-        return a[1] - b[1];
-    });
+    points.sort(orderInitialPoints);
 
     const lowest = points[0];
     hull = [lowest];
