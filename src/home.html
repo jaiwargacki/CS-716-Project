@@ -12,9 +12,14 @@
     <h1>Pedagogical Aid: Comparison and Analysis of Convex Hull Solutions.</h1>
     <h2>CSCI 716, Fall 2023</h2>
     Jai Wargacki, jpw5681@rit.edu
+    <!--- Names of people in your team. -->
 </div>
 
 <h3>Project Overview</h3>
+<p style="width: 80%; padding-left: 10%;">
+<!--- A specific description of the problem that you are trying to solve, in two sentences or less. 
+    This may be an answer to a question like: What does your application do? 
+    What is your visualization trying to show? What open problem were you trying to address?-->
 
 Expanding on the solutions implemented for assignment 1, my project 
 allows the user to compare the brute force, Graham's Scan, Divide and Conquer,
@@ -30,10 +35,55 @@ the brute force solution.
 
 <br><br><br>
 
+<!--- Background information about the problem and approach. Does not need to be 
+    long (one or two paragraphs is ok), but state any assumptions that are necessary 
+    for your approach to work-->
+
+<br><br><br>
+
+<!-- Describe the pseudo-code of the algorithm that you are creating and highlight
+     what parts of that pseudocode you are animating.-->
+
+For the code walk through portion of the application below, no pseudo-code is
+provided. Instead the code is written in JavaScript and is displayed in the
+code walkthrough section of the application. The application provides a 
+debugger-like experience, allowing the user to step through the code line by
+line. At each step, the user is provided with a description of the current
+step, a highlighted line of code, and information about relevant variables.
+The only "pseudo-code" like element of the application is the fact that the 
+user is unable to step into any of the helper functions. This is done to 
+keep the focus on the logic of the convex hull algorithms rather than 
+creating an in-browser debugger. The results of both tabs always display the 
+final convex hull in the left window. 
+
+<br><br><br>
+
+<!-- Discuss any interesting choices that you made in the implementation of the algorithm. -->
+
+Very few design choices were made during the completion of this project. The only one that 
+comes to mind is in order to keep consistency between the different algorithms, 
+all algorithms made sure to remove the center points of colinear points from the
+convex hull. This was done to keep the convex hulls of each algorithm consistent.
+Another design choice of note specific to this application is the order of points in the 
+convex hull. In order to draw the convex hull, the points must be in order. This is 
+done by sorting the points by their angle from the center point in a counter-clockwise order.
+The final choice I made was to not include a live line graph of the run time of each algorithm.
+I had previously planned on including this in the application, however, as I implemented it 
+I found it to not be very useful without a much more advanced graphing library. 
+The basic line graphs I was able to create were not very useful in comparing the run time of
+each algorithm specifically because of the automatic scaling my manual graphing did. 
+If I were to expand the functionality of this application, I would be interested
+in bringing in a more interactive graphing library to allow the user to zoom in on
+specific portions of the graph making that feature more useful.
+
+<br><br><br>
+
 The github repository for this project can be found at 
 <a href="https:www.github.com/jaiwargacki/CS-716-Project">CS-716-Project</a> and the 
 video presentation and demo can be found at 
 <a href="https:www.youtube.com">YouTube Link</a>.
+</p>
+
 
 <h3>Application</h3>
 <!-- Line -->
@@ -47,7 +97,7 @@ video presentation and demo can be found at
       <button class="button" id="runConvexHullButton" onclick="runAll()">Run Convex Hull</button>
       <button class="button" onclick="clearCanvas()">Clear</button>
     </div>
-    <canvas id="canvas" width="600" height="600" style="border:1px solid #000000;"></canvas>
+    <canvas id="canvas" width="600" height="700" style="border:1px solid #000000;"></canvas>
   </div>
   <div class="column">
     <!-- Tab areas Code and Runtime Analysis -->
@@ -55,7 +105,7 @@ video presentation and demo can be found at
       <button id="step-tab" class="bar-item" onclick="openTab('step')">Code Walkthrough</button>
       <button id="run-tab" class="bar-item bar-item-active" onclick="openTab('run')">Runtime Analysis</button>
     </div>
-    <div id="step" class="area" style="height: 600px;">
+    <div id="step" class="area" style="height: 700px;">
       <div style="height: 30px;">
         <!-- Dropdown to select algorithm -->
         <select id="algorithmForWalkThrough" onchange="changeAlgorithm()">
@@ -76,8 +126,7 @@ video presentation and demo can be found at
         </pre>
       </div>
       <hr>
-      <div id="codeDescription" style="height: 70px;">
-        This is a description of the code
+      <div id="codeDescription" style="height: 170px;">
       </div>
     </div>
     <div id="run" class="area" style="display: none;">
@@ -95,6 +144,7 @@ video presentation and demo can be found at
   </div>
 </div>
 
+<hr>
 <h3>Algorithm References</h3>
 
 Coffman, E. G., & Graham, R. L. (1972). Optimal scheduling for two-processor systems. Acta informatica,
