@@ -39,6 +39,33 @@ the brute force solution.
     long (one or two paragraphs is ok), but state any assumptions that are necessary 
     for your approach to work-->
 
+The Convex Hull problem is a classic problem in computational geometry. It is defined 
+given a set P of points in the plane, the convex hull of P, denoted conv(P), 
+can be defined intuitively by surrounding a collection of points with a rubber 
+band and then letting the rubber band 'snap' tightly around the points.
+The convex hull problem has a wide applications in many fields. For example in mathematics, 
+convex hulls are used to study polynomials and matrix eigenvalues. 
+In economics, convex hulls can be used to apply methods of convexity in economics to non-convex markets.
+Other relevant fields include statistics, combinatorial optimization, and geometric modeling.
+
+<br><br><br>
+
+The 4 algorithms implemented in this project are the brute force, Graham's Scan,
+Divide and Conquer, and Jarvis's March solutions. The brute force solution is the
+simplest solution to the convex hull problem. It works by looping through a 3 
+nested for loop, checking every possible line segment to confirm which 
+points are on the convex hull. The brute force solution has a run time of O(n^3).
+Graham's Scan algorithm finds the top and bottom hull for a set of sorted points.
+It is very efficient for sets of points that are already sorted. The run time of
+Graham's Scan is O(nlogn). Divide and 
+Conquer is a recursive algorithm that splits the set of points into two sets, 
+finding the convex hull of each set, and then merging the two convex hulls by finding 
+the upper and lower tangents for each merged hull. The run time of Divide and Conquer
+is O(nlogn). Jarvis's March is an iterative algorithm that finds the convex hull by
+tracking the next point on the convex hull. The run time of Jarvis's March is O(nh)
+where h is the number of points on the convex hull. It's worst case run time is O(n^2)
+and therefore is not as efficient as Graham's Scan or Divide and Conquer. 
+
 <br><br><br>
 
 <!-- Describe the pseudo-code of the algorithm that you are creating and highlight
@@ -62,7 +89,7 @@ final convex hull in the left window.
 
 Very few design choices were made during the completion of this project. The only one that 
 comes to mind is in order to keep consistency between the different algorithms, 
-all algorithms made sure to remove the center points of colinear points from the
+all algorithms made sure to remove the center points of collinear points from the
 convex hull. This was done to keep the convex hulls of each algorithm consistent.
 Another design choice of note specific to this application is the order of points in the 
 convex hull. In order to draw the convex hull, the points must be in order. This is 
@@ -156,6 +183,8 @@ Information processing letters, 2(1), 18-21.<br><br>
 
 Preparata, F. P., & Hong, S. J. (1977). Convex hulls of finite sets of points in two and three dimensions.
 Communications of the ACM, 20(2), 87-93.<br><br>
+
+* Course slides were also used in the completion of this project
 
 <h3>Project Timeline</h3>
 Progress can be tracked through the 
