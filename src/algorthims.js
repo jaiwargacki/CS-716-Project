@@ -797,7 +797,6 @@ async function divideAndConquerWalkthrough(points) {
     await highlightLine([24]);
     let rightHull = await divideAndConquerWalkthrough(rightPoints);
     
-
     let tangents = findTangents(leftHull, rightHull);
     await highlightLine([26]);
 
@@ -853,6 +852,74 @@ async function divideAndConquerWalkthrough(points) {
 }
 
 async function jarvisMarchWalkthrough() {
+    points.sort(orderInitialPoints);
+    await highlightLine([1]);
+
+    const lowest = points[0];
+    await highlightLine([3]);
+    hull = [lowest];
+    drawHull(hull);
+    await highlightLine([4]);
+
+    await highlightLine([6]);
+    while (true) {
+        p = hull[hull.length - 1];
+        await highlightLine([7]);
+        next = points[0];
+        await highlightLine([8]);
+        nextDistance = Math.sqrt(Math.pow(p[0] - next[0], 2) + 
+            Math.pow(p[1] - next[1], 2));
+        await highlightLine([9,10]);
+        for (let i = 1; i < points.length; i++) {
+            await highlightLine([11]);
+            await highlightLine([12]);
+            if (points[i][0] == p[0] && points[i][1] == p[1]) {
+                await highlightLine([13]);
+                continue;
+            }
+            await highlightLine([15]);
+            if (next[0] == p[0] && next[1] == p[1]) {
+                next = points[i];
+                await highlightLine([16]);
+                nextDistance = Math.sqrt(Math.pow(p[0] - next[0], 2) + 
+                    Math.pow(p[1] - next[1], 2));
+                await highlightLine([17,18]);
+                await highlightLine([19]);
+                continue;
+            }
+            let distance = Math.sqrt(Math.pow(p[0] - points[i][0], 2) + 
+                Math.pow(p[1] - points[i][1], 2));
+            await highlightLine([21,22]);
+            await highlightLine([23]);
+            if (orient(p, next, points[i]) == 0 && distance > nextDistance) {
+                next = points[i];
+                await highlightLine([24]);
+                nextDistance = distance;
+                await highlightLine([25]);
+            } else {
+                await highlightLine([26]);
+                if (orient(p, next, points[i]) > 0) {
+                    next = points[i];
+                    await highlightLine([27]);
+                    nextDistance = distance;
+                    await highlightLine([28]);
+                }
+            }
+        }
+
+        await highlightLine([32]);
+        if (next[0] == lowest[0] && next[1] == lowest[1]) {
+            await highlightLine([33]);
+            break;
+        }
+
+        hull.push(next);
+        drawHull(hull);
+        await highlightLine([36]);
+    }
+
+    await highlightLine([39]);
+    await highlightLine([-1]);
 }
 
 function runComplete() {
