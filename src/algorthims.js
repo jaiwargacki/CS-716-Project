@@ -238,14 +238,14 @@ function divideAndConquer(points) {
     points.sort(orderInitialPoints);
 
     const x_split = points.reduce(function (sum, point) {
-        return sum + point[0];
-    }, 0) / points.length;
+            return sum + point[0];
+        }, 0) / points.length;
     let leftPoints = points.filter(function (point) {
-        return point[0] <= x_split;
-    });
+            return point[0] <= x_split;
+        });
     let rightPoints = points.filter(function (point) {
-        return point[0] > x_split;
-    });
+            return point[0] > x_split;
+        });
 
     if (leftPoints.length == 0) {
         return bruteForce(rightPoints);
@@ -754,10 +754,102 @@ async function grahamScanWalkthrough() {
     drawHull(hull);
     await highlightLine([26]);
     await highlightLine([27]);
-    return hull;
+    await highlightLine([-1]);
 }
 
-async function divideAndConquerWalkthrough() {
+async function divideAndConquerWalkthrough(points) {
+    await highlightLine([1]);
+    if (points.length <= 3) {
+        await highlightLine([2]);
+        return bruteForce(points);
+    }
+
+    points.sort(orderInitialPoints);
+    await highlightLine([5]);
+
+    const x_split = points.reduce(function (sum, point) {
+        return sum + point[0];
+    }, 0) / points.length;
+    await highlightLine([7,8,9]);
+    let leftPoints = points.filter(function (point) {
+        return point[0] <= x_split;
+    });
+    await highlightLine([10,11,12]);
+    let rightPoints = points.filter(function (point) {
+        return point[0] > x_split;
+    });
+    await highlightLine([13,14,15]);
+
+    await highlightLine([17]);
+    if (leftPoints.length == 0) {
+        await highlightLine([18]);
+        return bruteForce(rightPoints);
+    } else {
+        await highlightLine([19]);
+        if (rightPoints.length == 0) {
+            await highlightLine([20]);
+            return bruteForce(leftPoints);
+        }
+    }
+
+    await highlightLine([23]);
+    let leftHull = await divideAndConquerWalkthrough(leftPoints);
+    await highlightLine([24]);
+    let rightHull = await divideAndConquerWalkthrough(rightPoints);
+    
+
+    let tangents = findTangents(leftHull, rightHull);
+    await highlightLine([26]);
+
+    let hull = [];
+    await highlightLine([28]);
+    leftHull = orderPoints(leftHull);
+    await highlightLine([29]);
+    for (let i = leftHull.indexOf(tangents[0][0]); 
+            i != leftHull.indexOf(tangents[1][0]); 
+            i = (i + 1) % leftHull.length) {
+        await highlightLine([30,31,32]);
+        hull.push(leftHull[i]);
+        drawHull(hull);
+        await highlightLine([33]);
+    }
+    hull.push(tangents[1][0]);
+    drawHull(hull);
+    await highlightLine([35]);
+    rightHull = orderPoints(rightHull).reverse();
+    await highlightLine([36]);
+    for (let i = rightHull.indexOf(tangents[0][1]); 
+            i != rightHull.indexOf(tangents[1][1]); 
+            i = (i + 1) % rightHull.length) {
+        await highlightLine([37,38,39]);
+        hull.push(rightHull[i]);
+        drawHull(hull);
+        await highlightLine([40]);
+    }
+    hull.push(tangents[1][1]);
+    drawHull(hull);
+    await highlightLine([42]);
+    finalHull = removeDuplicatePoints(hull);
+    drawHull(finalHull);
+    await highlightLine([43]);
+    finalHull = orderPoints(finalHull);
+    drawHull(finalHull);
+    await highlightLine([44]);
+    for (let i = 0; i < finalHull.length; i++) {
+        await highlightLine([45]);
+        await highlightLine([46, 47]);
+        if (orient(finalHull[i], finalHull[(i + 1) % finalHull.length], 
+                finalHull[(i + 2) % finalHull.length]) == 0) {
+            finalHull.splice((i + 1) % finalHull.length, 1);
+            drawHull(finalHull);
+            await highlightLine([48]);
+            i--;
+            await highlightLine([49]);
+        }
+    }
+
+    await highlightLine([53]);
+    await highlightLine([-1]);
 }
 
 async function jarvisMarchWalkthrough() {
@@ -779,7 +871,7 @@ function runComplete() {
     } else if (walkthroughAlgorithm == grahamScan) {
         grahamScanWalkthrough();
     } else if (walkthroughAlgorithm == divideAndConquer) {
-        divideAndConquerWalkthrough();
+        divideAndConquerWalkthrough(points);
     } else if (walkthroughAlgorithm == jarvisMarch) {
         jarvisMarchWalkthrough();
     }
