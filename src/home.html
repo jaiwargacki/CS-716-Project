@@ -1,11 +1,18 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <script src=https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.3.0/math.min.js></script>
+  <title>Convex Hull Learning Tool</title>
+</head>
+
+<body>
 <link rel="stylesheet" href="style.css">
-<h1>Pedagogical Aid: Comparison and Analysis of Convex Hull Solutions.</h1>
-
-Jai Wargacki, jpw5681@rit.edu<br>
-
-<h3>Project Link</h3>
-<a href="https://cs.rit.edu/~jpw5681/cs716/app.html">Project</a><br>
-<a href="https://github.com/jaiwargacki/CS-716-Project">GitHub</a><br>
+<!-- Center the text -->
+<div style="text-align: center;">
+    <h1>Pedagogical Aid: Comparison and Analysis of Convex Hull Solutions.</h1>
+    <h2>CSCI 716, Fall 2023</h2>
+    Jai Wargacki, jpw5681@rit.edu
+</div>
 
 <h3>Project Overview</h3>
 
@@ -21,6 +28,73 @@ two modes of comparison (step through and run time) allow the user to
 understand more fully the improvements that each solution provides over
 the brute force solution.
 
+<br><br><br>
+
+The github repository for this project can be found at 
+<a href="https:www.github.com/jaiwargacki/CS-716-Project">CS-716-Project</a> and the 
+video presentation and demo can be found at 
+<a href="https:www.youtube.com">YouTube Link</a>.
+
+<h3>Application</h3>
+<!-- Line -->
+<hr>
+<!-- Canvas and code walkthrough side by side-->
+<div class="row">
+  <div class="column">
+    <div id="canvasButtons">
+      <input type="text" id="numPoints" placeholder="Number of Points">
+      <button class="button" onclick="randomPoints()">Generate Random Points</button>
+      <button class="button" id="runConvexHullButton" onclick="runAll()">Run Convex Hull</button>
+      <button class="button" onclick="clearCanvas()">Clear</button>
+    </div>
+    <canvas id="canvas" width="600" height="600" style="border:1px solid #000000;"></canvas>
+  </div>
+  <div class="column">
+    <!-- Tab areas Code and Runtime Analysis -->
+    <div class="tab">
+      <button id="step-tab" class="bar-item" onclick="openTab('step')">Code Walkthrough</button>
+      <button id="run-tab" class="bar-item bar-item-active" onclick="openTab('run')">Runtime Analysis</button>
+    </div>
+    <div id="step" class="area" style="height: 600px;">
+      <div style="height: 30px;">
+        <!-- Dropdown to select algorithm -->
+        <select id="algorithmForWalkThrough" onchange="changeAlgorithm()">
+          <option value="bruteForce">Brute Force</option>
+          <option value="grahamScan">Graham's Scan</option>
+          <option value="divideAndConquer">Divide and Conquer</option>
+          <option value="jarvisMarch">Jarvis's March</option>
+        </select>
+        <!-- Step through code (With icons) -->
+        <button class="button" id="runButton" onclick="runComplete()">Run</button>
+        <button class="button" id="nextButton">Next</button>
+      </div>
+      <hr>
+      <!-- Code walkthrough -->
+      <div id="codeWalkthrough" style="overflow: auto; height: 500px;">
+        <pre>
+          <p id="codeWalkthroughText"></p>
+        </pre>
+      </div>
+      <hr>
+      <div id="codeDescription" style="height: 70px;">
+        This is a description of the code
+      </div>
+    </div>
+    <div id="run" class="area" style="display: none;">
+      <!-- Table of run times -->
+      <table id="timeTable">
+        <tr>
+          <th id="numberOfPointsLabel">Number of Points</th>
+          <th id='bruteForce' onclick="toggle('bruteForce')">Brute Force</th>
+          <th id='grahamScan' onclick="toggle('grahamScan')">Graham's Scan</th>
+          <th id='divideAndConquer' onclick="toggle('divideAndConquer')">Divide and Conquer</th>
+          <th id='jarvisMarch' onclick="toggle('jarvisMarch')">Jarvis's March</th>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
 <h3>Algorithm References</h3>
 
 Coffman, E. G., & Graham, R. L. (1972). Optimal scheduling for two-processor systems. Acta informatica,
@@ -34,11 +108,14 @@ Preparata, F. P., & Hong, S. J. (1977). Convex hulls of finite sets of points in
 Communications of the ACM, 20(2), 87-93.<br><br>
 
 <h3>Project Timeline</h3>
-The project timeline is below. Progress can also be tracked through the 
+Progress can be tracked through the 
 <a href="https://github.com/jaiwargacki/CS-716-Project/issues">issue tracker</a> on GitHub.<br>
 <hr>
 <footer>
-    <span style="float:left;">Last Updated: December 5, 2023</span>
+    <span style="float:left;">Last Updated: December 10, 2023</span>
     <span style="float:right;">jpw5681@rit.edu</span>
     <br>
+    <script src="algorthims.js" type="text/javascript"></script>
 </footer>
+</body>
+</html>

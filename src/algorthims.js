@@ -426,11 +426,13 @@ function openTab(mode) {
         document.getElementById("divideAndConquer").classList.remove("toggled");
         document.getElementById("jarvisMarch").classList.remove("toggled");
         walkthroughAlgorithm = undefined;
+        document.getElementById("runConvexHullButton").disabled = false;
     } else {
         runBruteForce = false;
         runGrahamScan = false;
         runDivideAndConquer = false;
         runJarvisMarch = false;
+        document.getElementById("runConvexHullButton").disabled = true;
         changeAlgorithm();
     }
 }
@@ -848,7 +850,7 @@ async function divideAndConquerWalkthrough(points) {
     }
 
     await highlightLine([53]);
-    await highlightLine([-1]);
+    return finalHull;
 }
 
 async function jarvisMarchWalkthrough() {
@@ -932,14 +934,29 @@ function runComplete() {
         return;
     }
 
+    // Disable runButton
+    document.getElementById("runButton").disabled = true;
+
     // Run algorithm
     if (walkthroughAlgorithm == bruteForce) {
-        bruteForceWalkthrough();
+        bruteForceWalkthrough().then(function() {
+            highlightLine([-1]);
+            document.getElementById("runButton").disabled = false;
+        });
     } else if (walkthroughAlgorithm == grahamScan) {
-        grahamScanWalkthrough();
+        grahamScanWalkthrough().then(function() {
+            highlightLine([-1]);
+            document.getElementById("runButton").disabled = false;
+        });
     } else if (walkthroughAlgorithm == divideAndConquer) {
-        divideAndConquerWalkthrough(points);
+        divideAndConquerWalkthrough(points).then(function() {
+            highlightLine([-1]);
+            document.getElementById("runButton").disabled = false;
+        });
     } else if (walkthroughAlgorithm == jarvisMarch) {
-        jarvisMarchWalkthrough();
+        jarvisMarchWalkthrough().then(function() { 
+            highlightLine([-1]);
+            document.getElementById("runButton").disabled = false;
+        });
     }
 }
