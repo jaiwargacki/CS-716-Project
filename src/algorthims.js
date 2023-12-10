@@ -906,73 +906,91 @@ async function divideAndConquerWalkthrough(points) {
 }
 
 async function jarvisMarchWalkthrough() {
+    inlineNotes = {};
+    inlineNotes[1] = "points.length=" + points.length;
     points.sort(orderInitialPoints);
-    await highlightLine([1]);
+    await highlightLine([1], "Sort the points by x coordinate");
 
     const lowest = points[0];
-    await highlightLine([3]);
+    inlineNotes[3] = "lowest=" + lowest;
+    await highlightLine([3], "Initialize the lowest point to the leftmost point");
     hull = [lowest];
     drawHull(hull);
-    await highlightLine([4]);
+    await highlightLine([4], "Initialize the hull to the lowest point");
 
-    await highlightLine([6]);
+    await highlightLine([6], "Loop until the lowest point is reached again");
     while (true) {
         p = hull[hull.length - 1];
-        await highlightLine([7]);
+        inlineNotes[7] = "p=" + p;
+        await highlightLine([7], "Set p to the last point in the hull");
         next = points[0];
-        await highlightLine([8]);
+        inlineNotes[8] = "next=" + next;
+        await highlightLine([8], "Set next to the first point in the points list");
         nextDistance = Math.sqrt(Math.pow(p[0] - next[0], 2) + 
             Math.pow(p[1] - next[1], 2));
-        await highlightLine([9,10]);
+        inlineNotes[10] = "nextDistance=" + nextDistance;
+        await highlightLine([9,10], "Set nextDistance to the distance between p and next");
         for (let i = 1; i < points.length; i++) {
-            await highlightLine([11]);
-            await highlightLine([12]);
+            inlineNotes[11] = "i=" + i + "; " + points[i];
+            await highlightLine([11], "Loop through the remaining points");
+            await highlightLine([12], "Skip the pairing of points if current point is the same point as p");
             if (points[i][0] == p[0] && points[i][1] == p[1]) {
-                await highlightLine([13]);
+                await highlightLine([13], "Skip the pairing of points if current point is the same point as p");
                 continue;
             }
-            await highlightLine([15]);
+            await highlightLine([15], "Update next if the points are the same point");
             if (next[0] == p[0] && next[1] == p[1]) {
                 next = points[i];
-                await highlightLine([16]);
+                inlineNotes[8] = "next=" + next;
+                await highlightLine([16], "Update next if the points are the same point");
                 nextDistance = Math.sqrt(Math.pow(p[0] - next[0], 2) + 
                     Math.pow(p[1] - next[1], 2));
-                await highlightLine([17,18]);
-                await highlightLine([19]);
+                inlineNotes[10] = "nextDistance=" + nextDistance;
+                await highlightLine([17,18], "Update nextDistance if the points are the same point");
+                await highlightLine([19], "Continue to the next point");
                 continue;
             }
             let distance = Math.sqrt(Math.pow(p[0] - points[i][0], 2) + 
                 Math.pow(p[1] - points[i][1], 2));
-            await highlightLine([21,22]);
-            await highlightLine([23]);
+            inlineNotes[20] = "distance=" + distance;
+            await highlightLine([21,22], "Calculate the distance between p and the current point");
+            inlineNotes[22] = "orient=" + orient(p, next, points[i]);
+            const descriptionOfThis = "Update next as needed. Conditions of orient being 0 and distance being > nextDistance is checked first. Then orient is checked. If orient is > 0, then the current point is to the left of the line from p to next.";
+            await highlightLine([23], descriptionOfThis);
             if (orient(p, next, points[i]) == 0 && distance > nextDistance) {
                 next = points[i];
-                await highlightLine([24]);
+                inlineNotes[8] = "next=" + next;
+                await highlightLine([24], descriptionOfThis);
                 nextDistance = distance;
-                await highlightLine([25]);
+                inlineNotes[10] = "nextDistance=" + nextDistance;
+                await highlightLine([25], descriptionOfThis);
             } else {
-                await highlightLine([26]);
+                await highlightLine([26], descriptionOfThis);
                 if (orient(p, next, points[i]) > 0) {
                     next = points[i];
-                    await highlightLine([27]);
+                    inlineNotes[8] = "next=" + next;
+                    await highlightLine([27], descriptionOfThis);
                     nextDistance = distance;
-                    await highlightLine([28]);
+                    inlineNotes[10] = "nextDistance=" + nextDistance;
+                    await highlightLine([28], descriptionOfThis);
                 }
             }
+            inlineNotes[22] = undefined;
         }
+        inlineNotes[11] = undefined;
 
-        await highlightLine([32]);
+        await highlightLine([32], "Check if the next point is the lowest point");
         if (next[0] == lowest[0] && next[1] == lowest[1]) {
-            await highlightLine([33]);
+            await highlightLine([33], "If the next point is the lowest point, break out of the loop");
             break;
         }
 
         hull.push(next);
         drawHull(hull);
-        await highlightLine([36]);
+        await highlightLine([36], "Add the next point to the hull");
     }
-
-    await highlightLine([39]);
+    inlineNotes = {};
+    await highlightLine([39], "Return the hull");
     await highlightLine([-1]);
 }
 
