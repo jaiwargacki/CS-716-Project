@@ -731,53 +731,64 @@ async function bruteForceWalkthrough() {
 }
 
 async function grahamScanWalkthrough() {
+    inlineNotes = {};
     points.sort(orderInitialPoints);
-    await highlightLine([1]);
+    await highlightLine([1], "Sort the points by x coordinate");
 
+    inlineNotes[2] = "points.length=" + points.length;
     await highlightLine([3]);
     if (points.length >= 2) {
         hull = [points[0], points[1]];
         drawHull(hull);
-        await highlightLine([4]);
+        await highlightLine([4], "If there are at least 2 points, initialize the hull to the first 2 points");
     } else {
-        await highlightLine([6]);
+        await highlightLine([6], "If there are less than 2 points, return an empty hull");
+        inlineNotes = {};
         return [];
     }
+    inlineNotes = {};
 
     for (let i = 2; i < points.length; i++) {
-        await highlightLine([9]);
-        await highlightLine([10,11]);
+        inlineNotes = {};
+        inlineNotes[9] = "i=" + i + "; " + points[i];
+        await highlightLine([9], "Loop through the remaining points");
+        await highlightLine([10,11], "Check if the point is to the left of the line from the last point in the hull to the second to last point in the hull");
         while (hull.length >= 2 && orient(points[i], hull[hull.length - 1], 
             hull[hull.length - 2]) <= 0) {
             hull.pop();
             drawHull(hull);
-            await highlightLine([12]);
+            await highlightLine([12], "If the point is to the left of the line from the last point in the hull to the second to last point in the hull, remove the last point in the hull");
         }
         hull.push(points[i]);
         drawHull(hull);
-        await highlightLine([14]);
+        await highlightLine([14], "Add the current point to the hull");
     }
+    inlineNotes = {};
     points.reverse();
-    await highlightLine([16]);
+    await highlightLine([16], "Reverse the points in preparation for the bottom hull");
     let bottomHull = [points[0], points[1]];
-    await highlightLine([17]);
+    await highlightLine([17], "Initialize the bottom hull to the first 2 points");
     for (let i = 2; i < points.length; i++) {
-        await highlightLine([19,20,21]);
+        inlineNotes = {};
+        inlineNotes[18] = "i=" + i + "; " + points[i];
+        await highlightLine([18], "Loop through the remaining points");
+        await highlightLine([19,20,21], "Check if the point is to the left of the line from the last point in the hull to the second to last point in the hull");
         while (bottomHull.length >= 2 && orient(points[i], 
             bottomHull[bottomHull.length - 1], 
             bottomHull[bottomHull.length - 2]) <= 0) {
             bottomHull.pop();
             drawHull(hull.concat(bottomHull));
-            await highlightLine([22]);
+            await highlightLine([22], "If the point is to the left of the line from the last point in the hull to the second to last point in the hull, remove the last point in the hull");
         }
         bottomHull.push(points[i]);
         drawHull(hull.concat(bottomHull));
-        await highlightLine([24]);
+        await highlightLine([24], "Add the current point to the hull");
     }
+    inlineNotes = {};
     hull = hull.concat(bottomHull.slice(1, bottomHull.length - 1));
     drawHull(hull);
-    await highlightLine([26]);
-    await highlightLine([27]);
+    await highlightLine([26], "Combine the top and bottom hulls");
+    await highlightLine([27], "Return the hull");
     await highlightLine([-1]);
 }
 
