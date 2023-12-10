@@ -210,7 +210,8 @@ function grahamScan(points) {
     }
 
     for (let i = 2; i < points.length; i++) {
-        while (hull.length >= 2 && orient(points[i], hull[hull.length - 1], hull[hull.length - 2]) <= 0) {
+        while (hull.length >= 2 && orient(points[i], hull[hull.length - 1], 
+          hull[hull.length - 2]) <= 0) {
             hull.pop();
         }
         hull.push(points[i]);
@@ -218,7 +219,9 @@ function grahamScan(points) {
     points.reverse();
     let bottomHull = [points[0], points[1]];
     for (let i = 2; i < points.length; i++) {
-        while (bottomHull.length >= 2 && orient(points[i], bottomHull[bottomHull.length - 1], bottomHull[bottomHull.length - 2]) <= 0) {
+        while (bottomHull.length >= 2 && orient(points[i], 
+          bottomHull[bottomHull.length - 1], 
+          bottomHull[bottomHull.length - 2]) <= 0) {
             bottomHull.pop();
         }
         bottomHull.push(points[i]);
@@ -704,6 +707,54 @@ async function bruteForceWalkthrough() {
 }
 
 async function grahamScanWalkthrough() {
+    points.sort(orderInitialPoints);
+    await highlightLine([1]);
+
+    await highlightLine([3]);
+    if (points.length >= 2) {
+        hull = [points[0], points[1]];
+        drawHull(hull);
+        await highlightLine([4]);
+    } else {
+        await highlightLine([6]);
+        return [];
+    }
+
+    for (let i = 2; i < points.length; i++) {
+        await highlightLine([9]);
+        await highlightLine([10,11]);
+        while (hull.length >= 2 && orient(points[i], hull[hull.length - 1], 
+            hull[hull.length - 2]) <= 0) {
+            hull.pop();
+            drawHull(hull);
+            await highlightLine([12]);
+        }
+        hull.push(points[i]);
+        drawHull(hull);
+        await highlightLine([14]);
+    }
+    points.reverse();
+    await highlightLine([16]);
+    let bottomHull = [points[0], points[1]];
+    await highlightLine([17]);
+    for (let i = 2; i < points.length; i++) {
+        await highlightLine([19,20,21]);
+        while (bottomHull.length >= 2 && orient(points[i], 
+            bottomHull[bottomHull.length - 1], 
+            bottomHull[bottomHull.length - 2]) <= 0) {
+            bottomHull.pop();
+            drawHull(hull.concat(bottomHull));
+            await highlightLine([22]);
+        }
+        bottomHull.push(points[i]);
+        drawHull(hull.concat(bottomHull));
+        await highlightLine([24]);
+    }
+    hull = hull.concat(bottomHull.slice(1, bottomHull.length - 1));
+    drawHull(hull);
+    await highlightLine([26]);
+    await highlightLine([27]);
+    return hull;
 }
 
 async function divideAndConquerWalkthrough() {
