@@ -603,10 +603,14 @@ function waitForButtonClick() {
   }
 
 async function highlightLine(lineNumbers) {
-    await highlightLine(lineNumbers, undefined);
+    await highlightLine(lineNumbers, undefined, undefined);
 }
 
 async function highlightLine(lineNumbers, note) {
+    await highlightLine(lineNumbers, note, undefined);
+}
+
+async function highlightLine(lineNumbers, note, inLineNote) {
     // lineNumbers list of line numbers to highlight
     // notes list of notes to display for each line
     let code = walkthroughAlgorithm.toString();
@@ -614,7 +618,11 @@ async function highlightLine(lineNumbers, note) {
     let highlightedCode = "";
     for (let i = 0; i < lines.length; i++) {
         if (lineNumbers.includes(i)) {
-            highlightedCode += "<mark>" + lines[i] + "</mark>\n";
+            if (inLineNote != undefined) {
+                highlightedCode += "<mark>" + lines[i] + "</mark>\t<span class=\"note\">" + inLineNote + "</span>\n";
+            } else {
+                highlightedCode += "<mark>" + lines[i] + "</mark>\n";
+            }
         } else {
             highlightedCode += lines[i] + "\n";
         }
@@ -633,65 +641,75 @@ async function highlightLine(lineNumbers, note) {
 
 async function bruteForceWalkthrough() {
     hull = [];
-    await highlightLine([1], "Initialize hull to empty list");
+    await highlightLine([1]);
 
     for (let p = 0; p < points.length; p++) {
-        await highlightLine([3])
+        await highlightLine([3]);
         for (let q = 0; q < points.length; q++) {
-            await highlightLine([4])
-            await highlightLine([5], "Check if p == q");
+            await highlightLine([4]);
+            await highlightLine([5]);
             if (p == q) {
-                await highlightLine([6], "Skip this iteration");
+                await highlightLine([6]);
                 continue;
             }
             let valid = true;
-            await highlightLine([8], "Set valid to true");
+            await highlightLine([8]);
             for (let r = 0; r < points.length; r++) {
-                await highlightLine([9])
-                await highlightLine([10], "Check if r == p or r == q");
+                await highlightLine([9]);
+                await highlightLine([10]);
                 if (r == p || r == q) {
-                    await highlightLine([11], "Skip this iteration");
+                    await highlightLine([11]);
                     continue;
                 }
-                await highlightLine([13], "Check if r is left of line from p to q");
+                await highlightLine([13]);
                 if (rLeftOfLine(points[p], points[q], points[r])) {
-                    await highlightLine([14], "Set valid to false");
                     valid = false;
-                    await highlightLine([15], "Break out of loop");
+                    await highlightLine([14]);
+                    await highlightLine([15]);
                     break;
                 }
             }
-            await highlightLine([18], "Check if still valid");
+            await highlightLine([18]);
             if (valid) {
                 hull.push(points[p]);
+                drawHull(hull);
+                await highlightLine([19]);
                 hull.push(points[q]);
                 drawHull(hull);
-                await highlightLine([19,20], "Add p and q to hull");
+                await highlightLine([20]);
             }
         }
     }
-    await highlightLine([24], "Check if hull is empty despite having points");
+    await highlightLine([24]);
     if (hull.length == 0 && points.length > 0) {
-        await highlightLine([25,26,27,28,29,30], "Sort points");
-        points.sort(function (a, b) {
-            if (a[0] == b[0]) {
-                return a[1] - b[1];
-            }
-            return a[0] - b[0];
-        });
+        points.sort(orderInitialPoints);
+        await highlightLine([25]);
         hull.push(points[0]);
+        drawHull(hull);
+        await highlightLine([26]);
         hull.push(points[points.length - 1]);
         drawHull(hull);
-        await highlightLine([31,32], "Add first and last point to hull");
+        await highlightLine([27]);
     }
 
-    await highlightLine([35], "Remove duplicate points from hull");
     finalHull = removeDuplicatePoints(hull);
-    finalHull = orderPoints(finalHull);
-    await highlightLine([36], "Order points in counter-clockwise order");
     drawHull(finalHull);
-    await highlightLine([37], "Return final hull");
-    return finalHull;
+    await highlightLine([30]);
+    finalHull = orderPoints(finalHull);
+    drawHull(finalHull);
+    await highlightLine([31]);
+    await highlightLine([32]);
+    await highlightLine([-1]);
+
+}
+
+async function grahamScanWalkthrough() {
+}
+
+async function divideAndConquerWalkthrough() {
+}
+
+async function jarvisMarchWalkthrough() {
 }
 
 function runComplete() {
